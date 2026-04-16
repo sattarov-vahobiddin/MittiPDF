@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rasm → PDF | Konvertor</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Background decoration -->
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <div class="bg-orb orb3"></div>
+
+  <div class="wrapper">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="2" y="2" width="16" height="20" rx="3" fill="#6C63FF" opacity="0.15"/>
+            <rect x="2" y="2" width="16" height="20" rx="3" stroke="#6C63FF" stroke-width="1.5"/>
+            <rect x="8" y="6" width="16" height="20" rx="3" fill="#FF6584" opacity="0.15"/>
+            <rect x="8" y="6" width="16" height="20" rx="3" stroke="#FF6584" stroke-width="1.5"/>
+            <path d="M5 9h10M5 13h7" stroke="#6C63FF" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="logo-text">MittiPDF</span>
+      </div>
+      <div class="header-badge">
+        <span class="dot"></span> Bepul · Onlayn
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1 class="hero-title">
+        Rasmlaringizni<br/>
+        <span class="gradient-text">PDF ga aylantiring</span>
+      </h1>
+      <p class="hero-sub">10+ rasm • Siqilgan • Tez • Qurilmada saqlanadi</p>
+    </section>
+
+    <!-- Upload Zone -->
+    <div class="upload-card" id="dropZone">
+      <div class="upload-inner">
+        <div class="upload-anim">
+          <div class="upload-circle">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <path d="M20 28V12M20 12L13 19M20 12L27 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 30c0 1.1.9 2 2 2h20a2 2 0 002-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <p class="upload-title">Rasmlarni bu yerga tashlang</p>
+        <p class="upload-sub">yoki</p>
+        <label class="btn-upload" for="fileInput">
+          Rasmlarni tanlang
+          <input type="file" id="fileInput" accept="image/*" multiple />
+        </label>
+        <p class="upload-formats">JPG · PNG · WEBP · GIF · BMP qabul qilinadi</p>
+      </div>
+    </div>
+
+    <!-- Stats bar (hidden until images added) -->
+    <div class="stats-bar" id="statsBar" style="display:none">
+      <div class="stat">
+        <span class="stat-num" id="statCount">0</span>
+        <span class="stat-label">ta rasm</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat">
+        <span class="stat-num" id="statSize">0 KB</span>
+        <span class="stat-label">hajm</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat">
+        <span class="stat-num" id="statPages">0</span>
+        <span class="stat-label">sahifa</span>
+      </div>
+    </div>
+
+    <!-- Image Preview Grid -->
+    <div class="preview-section" id="previewSection" style="display:none">
+      <div class="section-header">
+        <h2 class="section-title">Rasmlar <span class="pill" id="imgCountPill">0</span></h2>
+        <button class="btn-ghost-sm" onclick="clearAll()">Hammasini o'chirish</button>
+      </div>
+      <div class="preview-grid" id="previewGrid"></div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel" style="display:none">
+      <h2 class="section-title" style="margin-bottom:1.2rem">Sozlamalar</h2>
+      <div class="settings-grid">
+        <div class="setting-group">
+          <label class="setting-label">Sahifa o'lchami</label>
+          <div class="seg-control" id="pageSizeCtrl">
+            <button class="seg-btn active" data-val="a4" onclick="setSeg(this,'pageSizeCtrl')">A4</button>
+            <button class="seg-btn" data-val="a3" onclick="setSeg(this,'pageSizeCtrl')">A3</button>
+            <button class="seg-btn" data-val="letter" onclick="setSeg(this,'pageSizeCtrl')">Letter</button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Yo'nalish</label>
+          <div class="seg-control" id="orientCtrl">
+            <button class="seg-btn active" data-val="portrait" onclick="setSeg(this,'orientCtrl')">
+              <svg width="12" height="16" viewBox="0 0 12 16"><rect x="1" y="1" width="10" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+              Vertikal
+            </button>
+            <button class="seg-btn" data-val="landscape" onclick="setSeg(this,'orientCtrl')">
+              <svg width="16" height="12" viewBox="0 0 16 12"><rect x="1" y="1" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+              Gorizontal
+            </button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Sifat (siqish)</label>
+          <div class="seg-control" id="qualityCtrl">
+            <button class="seg-btn" data-val="0.5" onclick="setSeg(this,'qualityCtrl')">Yuqori siqish</button>
+            <button class="seg-btn active" data-val="0.72" onclick="setSeg(this,'qualityCtrl')">Muvozanat</button>
+            <button class="seg-btn" data-val="0.92" onclick="setSeg(this,'qualityCtrl')">Yuqori sifat</button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Fayl nomi</label>
+          <div class="input-wrap">
+            <input type="text" id="filename" class="text-input" value="mening-rasmlarim" placeholder="fayl-nomi" />
+            <span class="input-suffix">.pdf</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Convert Button -->
+    <div class="action-area" id="actionArea" style="display:none">
+      <button class="btn-convert" id="convertBtn" onclick="convertToPDF()">
+        <span id="btnContent">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 14v2a1 1 0 001 1h10a1 1 0 001-1v-2M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          PDF yaratish va saqlash
+        </span>
+      </button>
+      <p class="action-hint">Fayl qurilmangizga avtomatik yuklab olinadi</p>
+    </div>
+
+    <!-- Status Message -->
+    <div class="status-msg" id="statusMsg"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Rasmlaringiz faqat sizning qurilmangizda qayta ishlanadi · Serverga yuklanmaydi</p>
+    </footer>
+
+    <p class="admin">Admin: <a href="https://t.me/vakhob_dev" class="tg">Telegrm</a></p>
+
+
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
